@@ -15,11 +15,12 @@ import kotlin.test.assertFailsWith
 class AppTest {
 
     var bigramParser: BigramParser = BigramParserImpl()
+    val pathToTestingFiles = "src/test/resources/testingFiles"
 
     //region parseBigram
     @Test
     fun parseBigram_validDataNoSpecialChars_success() {
-        val input = "./testingFiles/validDataNoSpecialChars.txt"
+        val input = "${pathToTestingFiles}//validDataNoSpecialChars.txt"
         val expectedBigram1 = Bigram(firstWord = "the", secondWord = "quick", count = 2)
         val expectedBigram2 = Bigram(firstWord = "quick", secondWord = "brown", count = 1)
         val expectedBigram3 = Bigram(firstWord = "brown", secondWord = "fox", count = 1)
@@ -36,7 +37,7 @@ class AppTest {
 
     @Test
     fun parseBigram_validDataWithSpecialChars_success() {
-        val input = "testingFiles/validDataWithSpecialChars.txt"
+        val input = "${pathToTestingFiles}//validDataWithSpecialChars.txt"
         val expectedBigram1 = Bigram(firstWord = "hi", secondWord = "i", count = 2)
         val expectedBigram2 = Bigram(firstWord = "i", secondWord = "am", count = 1)
         val expectedBigram3 = Bigram(firstWord = "am", secondWord = "checking", count = 1)
@@ -56,8 +57,8 @@ class AppTest {
     }
 
     @Test
-    fun parseBigram_invalidOneWordInput_success() {
-        val input = "testingFiles/invalidOneWordInput.txt"
+    fun parseBigram_invalidOneWordInput_400() {
+        val input = "${pathToTestingFiles}/invalidOneWordInput.txt"
         val expectedBigramException = BigramParsingError(ErrorConsts.FEWER_THAN_TWO_WORDS_PROVIDED)
 
         val actualException = assertFailsWith<BigramParsingError> {
@@ -69,9 +70,22 @@ class AppTest {
     }
 
     @Test
-    fun parseBigram_invalidEmptyInput_success() {
-        val input = "testingFiles/invalidEmptyInput.txt"
+    fun parseBigram_invalidEmptyInput_400() {
+        val input = "${pathToTestingFiles}//invalidEmptyInput.txt"
         val expectedBigramException = BigramParsingError(ErrorConsts.FEWER_THAN_TWO_WORDS_PROVIDED)
+
+        val actualException = assertFailsWith<BigramParsingError> {
+            bigramParser.parseBigram(input)
+        }
+
+        assertEquals(expectedBigramException.javaClass, actualException.javaClass)
+        assertEquals(expectedBigramException.message, actualException.message)
+    }
+
+    @Test
+    fun parseBigram_invalidFilePath_404() {
+        val input = "${pathToTestingFiles}//fileDoesNotExist.txt"
+        val expectedBigramException = BigramParsingError(ErrorConsts.FILE_NOT_FOUND)
 
         val actualException = assertFailsWith<BigramParsingError> {
             bigramParser.parseBigram(input)

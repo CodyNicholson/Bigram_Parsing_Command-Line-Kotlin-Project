@@ -5,17 +5,22 @@ import cli.app.bigram_parser.ErrorConsts
 import cli.app.bigram_parser.models.Bigram
 import cli.app.error.BigramParsingError
 import java.io.File
+import java.io.FileNotFoundException
 
 class BigramParserImpl: BigramParser {
 
     private var bigramList: MutableList<Bigram> = mutableListOf()
 
     override fun parseBigram(filePath: String): List<Bigram> {
-        var text = ""
+        var fileText = ""
 
-        File(filePath).forEachLine { text += it }
+        try {
+            File(filePath).forEachLine { fileText += it }
+        } catch (e: FileNotFoundException) {
+            throw BigramParsingError(message = ErrorConsts.FILE_NOT_FOUND, cause = e)
+        }
 
-        val filteredText = filterSpecialCharsAndLowercaseText(text)
+        val filteredText = filterSpecialCharsAndLowercaseText(fileText)
         val wordList = filteredText.split(" ")
 
         if (wordList.size > 1) {
